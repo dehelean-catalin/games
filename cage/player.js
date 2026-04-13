@@ -28,8 +28,13 @@ class Player {
     return newRow != this.#rowNum || newColumn != this.#columnNum;
   }
 
-  draw() {
+  draw(isMyTrun) {
     this.#ctx.beginPath();
+    if (isMyTrun) {
+      this.#ctx.shadowColor = "black";
+      this.#ctx.shadowOffsetX = 2;
+      this.#ctx.shadowOffsetY = 2;
+    }
     this.#ctx.arc(
       this.#columnNum * 50 + 25,
       this.#rowNum * 50 + 25,
@@ -40,6 +45,8 @@ class Player {
     this.#ctx.fillStyle = this.#color;
     this.#ctx.fill();
     this.#ctx.stroke();
+    this.#ctx.shadowBlur = 0;
+    this.#ctx.shadowColor = "transparent";
   }
 
   moveTo(nextRowNum, nextColumnNum) {

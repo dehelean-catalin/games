@@ -39,7 +39,7 @@ class Board {
 
   addPlayers(...players) {
     this.players = [...players];
-    this.players.forEach((player) => player.draw());
+    this.players.forEach((player, idx) => player.draw(idx === 0));
 
     window.addEventListener("click", (e) =>
       this.handlePlayerMove.call(this, e),
@@ -128,7 +128,7 @@ class Board {
     this.draw();
 
     currentPlayer.moveTo(newTilePosition.row, newTilePosition.column);
-    nextPlayer.draw();
+    nextPlayer.draw(true);
 
     this.tracker.track(
       currentPlayer.getName(),
