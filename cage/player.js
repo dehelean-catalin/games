@@ -4,6 +4,8 @@ class Player {
   #columnNum = null;
   #color = null;
   #ctx = null;
+  #score = 0;
+  #winningPosition = null;
 
   constructor(ctx, playerName, rowStartNum, columnStartNum, playerColor) {
     this.#ctx = ctx;
@@ -11,6 +13,12 @@ class Player {
     this.#rowNum = rowStartNum;
     this.#columnNum = columnStartNum;
     this.#color = playerColor;
+    if (rowStartNum === 0) {
+      this.#winningPosition = 8;
+    }
+    if (rowStartNum === 8) {
+      this.#winningPosition = 0;
+    }
   }
 
   getName() {
@@ -52,6 +60,29 @@ class Player {
   moveTo(nextRowNum, nextColumnNum) {
     this.#rowNum = nextRowNum;
     this.#columnNum = nextColumnNum;
+    this.draw();
+
+    this.isWinningPosition();
+  }
+
+  isWinningPosition() {
+    if (this.#rowNum === this.#winningPosition) {
+      this.#score++;
+      return true;
+    }
+    return false;
+  }
+
+  restart(shouldClearScore = false) {
+    if (this.#winningPosition === 0) {
+      this.#rowNum = 8;
+    } else {
+      this.#rowNum = 0;
+    }
+    this.#columnNum = 4;
+    if (shouldClearScore) {
+      this.#score = 0;
+    }
     this.draw();
   }
 }

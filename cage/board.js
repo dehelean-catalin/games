@@ -13,12 +13,14 @@ class Board {
   #players = [];
   #tracker = null;
   #playerTurn = 0;
+  #isGameCompleted = false;
 
   constructor(ctx, boardElement, tilesNumber, tracker) {
     this.boardElement = boardElement;
     this.ctx = ctx;
     this.tilesNumber = tilesNumber;
     this.tracker = tracker;
+    this.#isGameCompleted = false;
 
     this.draw();
   }
@@ -86,6 +88,9 @@ class Board {
   }
 
   handlePlayerMove(e) {
+    if (this.#isGameCompleted) {
+      return;
+    }
     if (e.target.id != BOARD_ID) {
       return;
     }
@@ -136,7 +141,17 @@ class Board {
       newTilePosition.row,
       newTilePosition.column,
     );
-
+    if (currentPlayer.isWinningPosition()) {
+      this.tracker.track(
+        currentPlayer.getName(),
+        "Finish",
+        newTilePosition.row,
+        newTilePosition.column,
+      );
+      this.#isGameCompleted = true;
+      this.displayWinDialog();
+      return;
+    }
     this.updatePlayerTurn();
   }
 
@@ -150,6 +165,38 @@ class Board {
 
   getNextPlayerTurn() {
     return this.#playerTurn === 0 ? 1 : 0;
+  }
+
+  displayWinDialog() {
+    const gameElement = document.getElementById("game");
+    const dialogElement = document.createElement("dialog");
+    gameElement.appendChild(dialogElement);
+
+    const rematchBtn = document.createElement("button");
+    rematchBtn.textContent = "Rematch";
+    rematchBtn.addEventListener("click", () => {
+      this.restartGame();
+      dialogElement.close();
+    });
+
+    const restartBtn = document.createElement("button");
+    restartBtn.textContent = "Restart";
+    restartBtn.addEventListener("click", () => {
+      this.restartGame(true);
+      dialogElement.close();
+    });
+
+    dialogElement.appendChild(rematchBtn);
+    dialogElement.appendChild(restartBtn);
+
+    dialogElement.showModal();
+  }
+
+  restartGame(shouldRestartScore) {
+    this.clearBoard();
+    this.draw();
+    this.players.forEach((player) => player.restart(shouldRestartScore));
+    this.#isGameCompleted = false;
   }
 }
 
