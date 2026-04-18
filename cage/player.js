@@ -3,12 +3,22 @@ class Player {
   #rowNum = null;
   #columnNum = null;
   #color = null;
-  #ctx = null;
   #score = 0;
   #winningPosition = null;
 
-  constructor(ctx, playerName, rowStartNum, columnStartNum, playerColor) {
-    this.#ctx = ctx;
+  #drawer = null;
+  #scoreDrawer = null;
+
+  constructor(
+    drawer,
+    playerName,
+    rowStartNum,
+    columnStartNum,
+    playerColor,
+    scoreDrawer,
+  ) {
+    this.#drawer = drawer;
+    this.#scoreDrawer = scoreDrawer;
     this.#name = playerName;
     this.#rowNum = rowStartNum;
     this.#columnNum = columnStartNum;
@@ -37,24 +47,7 @@ class Player {
   }
 
   draw(isMyTrun) {
-    this.#ctx.beginPath();
-    if (isMyTrun) {
-      this.#ctx.shadowColor = "black";
-      this.#ctx.shadowOffsetX = 2;
-      this.#ctx.shadowOffsetY = 2;
-    }
-    this.#ctx.arc(
-      this.#columnNum * 50 + 25,
-      this.#rowNum * 50 + 25,
-      15,
-      0,
-      2 * Math.PI,
-    );
-    this.#ctx.fillStyle = this.#color;
-    this.#ctx.fill();
-    this.#ctx.stroke();
-    this.#ctx.shadowBlur = 0;
-    this.#ctx.shadowColor = "transparent";
+    this.#drawer.draw(this.#rowNum, this.#columnNum, this.#color, isMyTrun);
   }
 
   moveTo(nextRowNum, nextColumnNum) {
@@ -62,15 +55,14 @@ class Player {
     this.#columnNum = nextColumnNum;
     this.draw();
 
-    this.isWinningPosition();
+    if (this.isWinningPosition()) {
+      this.#score++;
+      this.updateDisplayScore(this.#winningPosition === 0);
+    }
   }
 
   isWinningPosition() {
-    if (this.#rowNum === this.#winningPosition) {
-      this.#score++;
-      return true;
-    }
-    return false;
+    return this.#rowNum === this.#winningPosition;
   }
 
   restart(shouldClearScore = false) {
@@ -82,8 +74,17 @@ class Player {
     this.#columnNum = 4;
     if (shouldClearScore) {
       this.#score = 0;
+      this.#scoreDrawer.restart();
     }
-    this.draw();
+    this.draw(this.#winningPosition === 0);
+  }
+
+  updateDisplayScore(isMyWin) {
+    this.#scoreDrawer.draw(this.#score, isMyWin);
+  }
+
+  restartDisplayScore() {
+    this.#scoreDrawer.reset();
   }
 }
 

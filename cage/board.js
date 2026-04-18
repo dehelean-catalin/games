@@ -1,5 +1,7 @@
 import Player from "./player.js";
 import PlayerActionTracker from "./playerActionTracker.js";
+import PlayerDrawer from "./ui/PlayerDrawer.js";
+import ScoreDrawer from "./ui/ScoreDrawer.js";
 
 const BOARD_ID = "board";
 
@@ -203,8 +205,18 @@ class Board {
 const boardElement = document.getElementById(BOARD_ID);
 const ctx = boardElement.getContext("2d");
 
-const bluePlayer = new Player(ctx, "Blue", 0, 4, "#1181f1");
-const redPlayer = new Player(ctx, "Red", 8, 4, "#893311");
+const playerDrawer = new PlayerDrawer(ctx);
+const scoreDrawer = new ScoreDrawer(ctx);
+
+const bluePlayer = new Player(
+  playerDrawer,
+  "Blue",
+  0,
+  4,
+  "#1181f1",
+  scoreDrawer,
+);
+const redPlayer = new Player(playerDrawer, "Red", 8, 4, "#893311", scoreDrawer);
 const playerActionTracker = new PlayerActionTracker();
 
 const board = new Board(ctx, boardElement, 8, playerActionTracker);

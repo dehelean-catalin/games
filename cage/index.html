@@ -4,22 +4,33 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Cage</title>
-    <script defer src="player.js" type="module"></script>
-    <script defer src="playerActionTracker.js" type="module"></script>
+    <link rel="stylesheet" href="main.css" />
+
     <script defer src="board.js" type="module"></script>
   </head>
   <body>
     <h1>Board Game</h1>
-    <div id="game">
+    <div id="game" class="game">
       <canvas
         id="board"
         width="600"
         height="600"
         style="background-color: antiquewhite; margin-left: 40px"
       ></canvas>
-      <div>Player Score</div>
-      <p>Player Tracker</p>
-      <ul id="player-action-tracker"></ul>
+      <div id="scoare-board" class="score-board">
+        <div id="game-score">
+          Score
+          <div>
+            <spam id="score">0</spam>
+            <spam>-</spam>
+            <spam id="opponent-score">0</spam>
+          </div>
+        </div>
+      </div>
+      <div class="player-tracker">
+        <p>Player Tracker</p>
+        <ul id="player-action-tracker"></ul>
+      </div>
     </div>
   </body>
 </html>
