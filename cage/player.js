@@ -1,10 +1,10 @@
 class Player {
   #name = "";
-  #rowNum = null;
-  #columnNum = null;
+  #row = null;
+  #column = null;
   #color = null;
   #score = 0;
-  #winningPosition = null;
+  #winnerRow = null;
 
   #drawer = null;
   #scoreDrawer = null;
@@ -12,22 +12,22 @@ class Player {
   constructor(
     drawer,
     playerName,
-    rowStartNum,
-    columnStartNum,
+    initalRow,
+    initalColumn,
     playerColor,
     scoreDrawer,
   ) {
     this.#drawer = drawer;
     this.#scoreDrawer = scoreDrawer;
     this.#name = playerName;
-    this.#rowNum = rowStartNum;
-    this.#columnNum = columnStartNum;
+    this.#row = initalRow;
+    this.#column = initalColumn;
     this.#color = playerColor;
-    if (rowStartNum === 0) {
-      this.#winningPosition = 8;
+    if (initalRow === 0) {
+      this.#winnerRow = 8;
     }
-    if (rowStartNum === 8) {
-      this.#winningPosition = 0;
+    if (initalRow === 8) {
+      this.#winnerRow = 0;
     }
   }
 
@@ -37,46 +37,46 @@ class Player {
 
   getTilePosition() {
     return {
-      row: this.#rowNum,
-      column: this.#columnNum,
+      row: this.#row,
+      column: this.#column,
     };
   }
 
   hasTilePositionChanged(newRow, newColumn) {
-    return newRow != this.#rowNum || newColumn != this.#columnNum;
+    return newRow != this.#row || newColumn != this.#column;
   }
 
   draw(isMyTrun) {
-    this.#drawer.draw(this.#rowNum, this.#columnNum, this.#color, isMyTrun);
+    this.#drawer.draw(this.#row, this.#column, this.#color, isMyTrun);
   }
 
-  moveTo(nextRowNum, nextColumnNum) {
-    this.#rowNum = nextRowNum;
-    this.#columnNum = nextColumnNum;
-    this.draw();
+  moveTo(nextRow, nextColumn) {
+    this.#row = nextRow;
+    this.#column = nextColumn;
+    this.draw(this.isWinner(nextRow));
 
-    if (this.isWinningPosition()) {
+    if (this.isWinner(nextRow)) {
       this.#score++;
-      this.updateDisplayScore(this.#winningPosition === 0);
+      this.updateDisplayScore(this.#winnerRow === 0);
     }
   }
 
-  isWinningPosition() {
-    return this.#rowNum === this.#winningPosition;
+  isWinner(row) {
+    return this.#winnerRow === row;
   }
 
   restart(shouldClearScore = false) {
-    if (this.#winningPosition === 0) {
-      this.#rowNum = 8;
+    if (this.#winnerRow === 0) {
+      this.#row = 8;
     } else {
-      this.#rowNum = 0;
+      this.#row = 0;
     }
-    this.#columnNum = 4;
+    this.#column = 4;
     if (shouldClearScore) {
       this.#score = 0;
-      this.#scoreDrawer.restart();
+      this.#scoreDrawer.reset();
     }
-    this.draw(this.#winningPosition === 0);
+    this.draw(this.#winnerRow === 0);
   }
 
   updateDisplayScore(isMyWin) {

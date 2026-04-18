@@ -17,20 +17,43 @@ class Board {
   #playerTurn = 0;
   #isGameCompleted = false;
 
-  constructor(ctx, boardElement, tilesNumber, tracker) {
+  constructor(ctx, boardElement, tilesNumber, tracker, ...players) {
     this.boardElement = boardElement;
     this.ctx = ctx;
     this.tilesNumber = tilesNumber;
     this.tracker = tracker;
     this.#isGameCompleted = false;
+    this.players = [...players];
 
-    this.draw();
+    this.draw(players[0].getTilePosition());
+    this.players.forEach((player, idx) => player.draw(idx === 0));
+
+    window.addEventListener("click", (e) =>
+      this.handlePlayerMove.call(this, e),
+    );
   }
 
-  draw() {
+  draw(nextPlayerPosition, newTilePosition, isWinner) {
     for (let xAxis = 0; xAxis <= this.tilesNumber; xAxis++) {
       for (let yAxis = 0; yAxis <= this.tilesNumber; yAxis++) {
         this.ctx.fillStyle = "#f111f1";
+
+        if (nextPlayerPosition && !isWinner) {
+          const position = {
+            row: xAxis,
+            column: yAxis,
+          };
+          if (this.isTileAdjestment(nextPlayerPosition, position)) {
+            this.ctx.fillStyle = "#ff89ff";
+
+            if (
+              newTilePosition?.column === yAxis &&
+              newTilePosition?.row === xAxis
+            ) {
+              this.ctx.fillStyle = "#f111f1";
+            }
+          }
+        }
         this.ctx.fillRect(
           Board.tileBackgroundSize * yAxis,
           Board.tileBackgroundSize * xAxis,
@@ -39,15 +62,6 @@ class Board {
         );
       }
     }
-  }
-
-  addPlayers(...players) {
-    this.players = [...players];
-    this.players.forEach((player, idx) => player.draw(idx === 0));
-
-    window.addEventListener("click", (e) =>
-      this.handlePlayerMove.call(this, e),
-    );
   }
 
   clearBoard() {
@@ -90,10 +104,10 @@ class Board {
   }
 
   handlePlayerMove(e) {
-    if (this.#isGameCompleted) {
+    if (e.target.id != BOARD_ID) {
       return;
     }
-    if (e.target.id != BOARD_ID) {
+    if (this.#isGameCompleted) {
       return;
     }
 
@@ -132,10 +146,11 @@ class Board {
     }
 
     this.clearBoard();
-    this.draw();
 
+    const isWinner = currentPlayer.isWinner(newTilePosition.row);
+    this.draw(nextPlayer.getTilePosition(), newTilePosition, isWinner);
     currentPlayer.moveTo(newTilePosition.row, newTilePosition.column);
-    nextPlayer.draw(true);
+    nextPlayer.draw(!isWinner);
 
     this.tracker.track(
       currentPlayer.getName(),
@@ -143,7 +158,8 @@ class Board {
       newTilePosition.row,
       newTilePosition.column,
     );
-    if (currentPlayer.isWinningPosition()) {
+
+    if (isWinner) {
       this.tracker.track(
         currentPlayer.getName(),
         "Finish",
@@ -196,7 +212,8 @@ class Board {
 
   restartGame(shouldRestartScore) {
     this.clearBoard();
-    this.draw();
+    //TODO: Add Initial position of the first player in the array
+    this.draw({ row: 8, column: 4 });
     this.players.forEach((player) => player.restart(shouldRestartScore));
     this.#isGameCompleted = false;
   }
@@ -219,5 +236,4 @@ const bluePlayer = new Player(
 const redPlayer = new Player(playerDrawer, "Red", 8, 4, "#893311", scoreDrawer);
 const playerActionTracker = new PlayerActionTracker();
 
-const board = new Board(ctx, boardElement, 8, playerActionTracker);
-board.addPlayers(redPlayer, bluePlayer);
+new Board(ctx, boardElement, 8, playerActionTracker, redPlayer, bluePlayer);
