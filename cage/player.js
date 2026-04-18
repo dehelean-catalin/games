@@ -2,6 +2,8 @@ class Player {
   #name = "";
   #row = null;
   #column = null;
+  #initialRow = null;
+  #initialColumn = null;
   #color = null;
   #score = 0;
   #winnerRow = null;
@@ -23,6 +25,9 @@ class Player {
     this.#row = initalRow;
     this.#column = initalColumn;
     this.#color = playerColor;
+    this.#initialRow = initalRow;
+    this.#initialColumn = initalColumn;
+
     if (initalRow === 0) {
       this.#winnerRow = 8;
     }
@@ -35,10 +40,17 @@ class Player {
     return this.#name;
   }
 
-  getTilePosition() {
+  getPosition() {
     return {
       row: this.#row,
       column: this.#column,
+    };
+  }
+
+  getInitialPosition() {
+    return {
+      row: this.#initialRow,
+      column: this.#initialColumn,
     };
   }
 

@@ -24,7 +24,7 @@ class Board {
     this.#isGameCompleted = false;
     this.players = [...players];
 
-    this.draw(players[0].getTilePosition());
+    this.draw(players[0].getPosition());
     this.players.forEach((player, idx) => player.draw(idx === 0));
 
     window.addEventListener("click", (e) =>
@@ -67,7 +67,7 @@ class Board {
     this.ctx.clearRect(0, 0, this.boardSize, this.boardSize);
   }
 
-  getTilePosition(e) {
+  getPosition(e) {
     const column = Math.floor(
       (e.x - e.target.offsetLeft) / Board.tileBackgroundSize,
     );
@@ -110,7 +110,7 @@ class Board {
       return;
     }
 
-    const newTilePosition = this.getTilePosition(e);
+    const newTilePosition = this.getPosition(e);
     if (!newTilePosition) {
       return;
     }
@@ -127,7 +127,7 @@ class Board {
     }
 
     const isTileAdjestment = this.isTileAdjestment(
-      currentPlayer.getTilePosition(),
+      currentPlayer.getPosition(),
       newTilePosition,
     );
 
@@ -136,7 +136,7 @@ class Board {
     }
 
     const isTileBlockByNextPlayer = this.isTileBlockByNextPlayer(
-      nextPlayer.getTilePosition(),
+      nextPlayer.getPosition(),
       newTilePosition,
     );
 
@@ -147,7 +147,7 @@ class Board {
     this.clearBoard();
 
     const isWinner = currentPlayer.isWinner(newTilePosition.row);
-    this.draw(nextPlayer.getTilePosition(), newTilePosition, isWinner);
+    this.draw(nextPlayer.getPosition(), newTilePosition, isWinner);
     currentPlayer.moveTo(newTilePosition.row, newTilePosition.column);
     nextPlayer.draw(!isWinner);
 
@@ -211,8 +211,7 @@ class Board {
 
   restartGame(shouldRestartScore) {
     this.clearBoard();
-    //TODO: Add Initial position of the first player in the array
-    this.draw({ row: 8, column: 4 });
+    this.draw(this.players[0].getInitialPosition());
     this.players.forEach((player) => player.restart(shouldRestartScore));
     this.#isGameCompleted = false;
   }
