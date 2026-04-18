@@ -27,7 +27,7 @@ class Board {
     this.draw(players[0].getPosition());
     this.players.forEach((player, idx) => player.draw(idx === 0));
 
-    window.addEventListener("click", (e) =>
+    this.boardElement.addEventListener("click", (e) =>
       this.handlePlayerMove.call(this, e),
     );
   }
@@ -103,32 +103,26 @@ class Board {
   }
 
   handlePlayerMove(e) {
-    if (e.target.id != BOARD_ID) {
-      return;
-    }
     if (this.#isGameCompleted) {
       return;
     }
 
-    const newTilePosition = this.getPosition(e);
-    if (!newTilePosition) {
+    const newPosition = this.getPosition(e);
+    if (!newPosition) {
       return;
     }
 
     const currentPlayer = this.players[this.#playerTurn];
     const nextPlayer = this.players[this.getNextPlayerTurn()];
     if (
-      !currentPlayer.hasTilePositionChanged(
-        newTilePosition.row,
-        newTilePosition.column,
-      )
+      !currentPlayer.hasTilePositionChanged(newPosition.row, newPosition.column)
     ) {
       return;
     }
 
     const isTileAdjestment = this.isTileAdjestment(
       currentPlayer.getPosition(),
-      newTilePosition,
+      newPosition,
     );
 
     if (!isTileAdjestment) {
@@ -137,7 +131,7 @@ class Board {
 
     const isTileBlockByNextPlayer = this.isTileBlockByNextPlayer(
       nextPlayer.getPosition(),
-      newTilePosition,
+      newPosition,
     );
 
     if (isTileBlockByNextPlayer) {
@@ -146,24 +140,24 @@ class Board {
 
     this.clearBoard();
 
-    const isWinner = currentPlayer.isWinner(newTilePosition.row);
-    this.draw(nextPlayer.getPosition(), newTilePosition, isWinner);
-    currentPlayer.moveTo(newTilePosition.row, newTilePosition.column);
+    const isWinner = currentPlayer.isWinner(newPosition.row);
+    this.draw(nextPlayer.getPosition(), newPosition, isWinner);
+    currentPlayer.moveTo(newPosition.row, newPosition.column);
     nextPlayer.draw(!isWinner);
 
     this.tracker.track(
       currentPlayer.getName(),
       "move",
-      newTilePosition.row,
-      newTilePosition.column,
+      newPosition.row,
+      newPosition.column,
     );
 
     if (isWinner) {
       this.tracker.track(
         currentPlayer.getName(),
         "Finish",
-        newTilePosition.row,
-        newTilePosition.column,
+        newPosition.row,
+        newPosition.column,
       );
       this.#isGameCompleted = true;
       this.displayWinDialog();
