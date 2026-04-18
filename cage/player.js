@@ -57,7 +57,7 @@ class Player {
 
     if (this.isWinner(nextRow)) {
       this.#score++;
-      this.updateDisplayScore(this.#winnerRow === 0);
+      this.#scoreDrawer.draw(this.#score, this.#winnerRow === 0);
     }
   }
 
@@ -66,7 +66,8 @@ class Player {
   }
 
   restart(shouldClearScore = false) {
-    if (this.#winnerRow === 0) {
+    const isBottomPlayerWinner = this.#winnerRow === 0;
+    if (isBottomPlayerWinner) {
       this.#row = 8;
     } else {
       this.#row = 0;
@@ -76,15 +77,7 @@ class Player {
       this.#score = 0;
       this.#scoreDrawer.reset();
     }
-    this.draw(this.#winnerRow === 0);
-  }
-
-  updateDisplayScore(isMyWin) {
-    this.#scoreDrawer.draw(this.#score, isMyWin);
-  }
-
-  restartDisplayScore() {
-    this.#scoreDrawer.reset();
+    this.draw(isBottomPlayerWinner);
   }
 }
 
