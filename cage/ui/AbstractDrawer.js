@@ -1,4 +1,4 @@
-class Drawer {
+class AbstractDrawer {
   ctx = null;
 
   constructor(ctx) {
@@ -14,4 +14,4 @@ class Drawer {
   }
 }
 
-export default Drawer;
+export default AbstractDrawer;

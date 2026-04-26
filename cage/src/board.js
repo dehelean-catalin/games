@@ -1,31 +1,24 @@
-import { BOARD_ID } from "./main.js";
-import Player from "./player.js";
-import PlayerActionTracker from "./playerActionTracker.js";
-import PlayerDrawer from "./ui/PlayerDrawer.js";
-import ScoreDrawer from "./ui/ScoreDrawer.js";
+import AbstractEventListener from "./abstractEventListener.js";
 
-class Board {
-  static tileSize = 48;
+class Board extends AbstractEventListener {
   static tileBackgroundSize = 50;
-  static boardSize = 600;
 
   #boardElement = null;
-  #ctx = null;
-  #tilesNumber = 0;
+  #tilesNumber = 8;
   #players = [];
-  #tracker = null;
   #playerTurn = 0;
   #isGameCompleted = false;
 
-  constructor(ctx, boardElement, tilesNumber, tracker, ...players) {
-    this.#boardElement = boardElement;
-    this.#ctx = ctx;
-    this.#tilesNumber = tilesNumber;
-    this.#tracker = tracker;
-    this.#isGameCompleted = false;
-    this.#players = [...players];
+  constructor(boardElement, ...players) {
+    super();
 
-    this.draw(players[0].getPosition());
+    this.#boardElement = boardElement;
+    this.#players = [...players];
+  }
+
+  init() {
+    const firstPlayer = this.#players[0];
+    this.draw(firstPlayer.getPosition());
     this.#players.forEach((player, idx) => player.draw(idx === 0));
 
     this.#boardElement.addEventListener("click", (e) =>
@@ -34,38 +27,12 @@ class Board {
   }
 
   draw(nextPlayerPosition, newTilePosition, isWinner) {
-    for (let xAxis = 0; xAxis <= this.#tilesNumber; xAxis++) {
-      for (let yAxis = 0; yAxis <= this.#tilesNumber; yAxis++) {
-        this.#ctx.fillStyle = "#f111f1";
-
-        if (nextPlayerPosition && !isWinner) {
-          const position = {
-            row: xAxis,
-            column: yAxis,
-          };
-          if (this.isTileAdjestment(nextPlayerPosition, position)) {
-            this.#ctx.fillStyle = "#ff89ff";
-
-            if (
-              newTilePosition?.column === yAxis &&
-              newTilePosition?.row === xAxis
-            ) {
-              this.#ctx.fillStyle = "#f111f1";
-            }
-          }
-        }
-        this.#ctx.fillRect(
-          Board.tileBackgroundSize * yAxis,
-          Board.tileBackgroundSize * xAxis,
-          Board.tileSize,
-          Board.tileSize,
-        );
-      }
-    }
-  }
-
-  clearBoard() {
-    this.#ctx.clearRect(0, 0, Board.boardSize, Board.boardSize);
+    this.dispatch("change", {
+      tilesNumber: 8,
+      nextPlayerPosition: nextPlayerPosition,
+      newTilePosition: newTilePosition,
+      isWinner: isWinner,
+    });
   }
 
   getPosition(e) {
@@ -139,27 +106,26 @@ class Board {
       return;
     }
 
-    this.clearBoard();
+    // Valid Position turn can start
+    this.dispatch("reset");
 
     const isWinner = currentPlayer.isWinner(newPosition.row);
     this.draw(nextPlayer.getPosition(), newPosition, isWinner);
     currentPlayer.moveTo(newPosition.row, newPosition.column);
     nextPlayer.draw(!isWinner);
 
-    this.#tracker.track(
-      currentPlayer.getName(),
-      "move",
-      newPosition.row,
-      newPosition.column,
-    );
+    this.dispatch("track-move", {
+      playerName: currentPlayer.getName(),
+      type: "move",
+      position: newPosition,
+    });
 
     if (isWinner) {
-      this.#tracker.track(
-        currentPlayer.getName(),
-        "Finish",
-        newPosition.row,
-        newPosition.column,
-      );
+      this.dispatch("win", {
+        playerName: currentPlayer.getName(),
+        type: "move",
+        position: newPosition,
+      });
       this.#isGameCompleted = true;
       this.displayWinDialog();
       return;
@@ -205,7 +171,7 @@ class Board {
   }
 
   restartGame(shouldRestartScore) {
-    this.clearBoard();
+    this.dispatch("reset");
     this.draw(this.#players[0].getInitialPosition());
     this.#players.forEach((player) => player.restart(shouldRestartScore));
     this.#isGameCompleted = false;
