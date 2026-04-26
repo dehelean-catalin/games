@@ -15,22 +15,18 @@ export const BOARD_ID = "board";
   const scoreDrawer = new ScoreDrawer(ctx);
   const boardDrawer = new BoardDrawer(ctx);
 
-  const bluePlayer = new Player(
-    playerDrawer,
-    "Blue",
-    0,
-    4,
-    "#1181f1",
-    scoreDrawer,
-  );
-  const redPlayer = new Player(
-    playerDrawer,
-    "Red",
-    8,
-    4,
-    "#893311",
-    scoreDrawer,
-  );
+  const bluePlayer = new Player("Blue", 0, 4, "#1181f1");
+  bluePlayer
+    .on("draw", ({ row, column, color, isMyTurn }) => playerDrawer.draw(row, column, color, isMyTurn))
+    .on("score", ({ score, isBottomPlayer }) => scoreDrawer.draw(score, isBottomPlayer))
+    .on("score-reset", () => scoreDrawer.reset());
+
+  const redPlayer = new Player("Red", 8, 4, "#893311");
+  redPlayer
+    .on("draw", ({ row, column, color, isMyTurn }) => playerDrawer.draw(row, column, color, isMyTurn))
+    .on("score", ({ score, isBottomPlayer }) => scoreDrawer.draw(score, isBottomPlayer))
+    .on("score-reset", () => scoreDrawer.reset());
+
   const playerActionTracker = new PlayerActionTracker();
 
   const board = new Board(boardElement, redPlayer, bluePlayer);

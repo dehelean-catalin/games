@@ -3,7 +3,6 @@ class AbstractEventListener {
   constructor() {}
 
   on(evt, listener) {
-    console.log("init");
     if (this.#listeners.hasOwnProperty(evt)) {
       this.#listeners[evt] = [...this.#listeners[evt], listener];
     } else {

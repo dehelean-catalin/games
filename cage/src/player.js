@@ -1,4 +1,6 @@
-class Player {
+import AbstractEventListener from "./abstractEventListener.js";
+
+class Player extends AbstractEventListener {
   #name = "";
   #row = null;
   #column = null;
@@ -8,19 +10,8 @@ class Player {
   #score = 0;
   #winnerRow = null;
 
-  #drawer = null;
-  #scoreDrawer = null;
-
-  constructor(
-    drawer,
-    playerName,
-    initalRow,
-    initalColumn,
-    playerColor,
-    scoreDrawer,
-  ) {
-    this.#drawer = drawer;
-    this.#scoreDrawer = scoreDrawer;
+  constructor(playerName, initalRow, initalColumn, playerColor) {
+    super();
     this.#name = playerName;
     this.#row = initalRow;
     this.#column = initalColumn;
@@ -58,8 +49,8 @@ class Player {
     return newRow != this.#row || newColumn != this.#column;
   }
 
-  draw(isMyTrun) {
-    this.#drawer.draw(this.#row, this.#column, this.#color, isMyTrun);
+  draw(isMyTurn) {
+    this.dispatch("draw", { row: this.#row, column: this.#column, color: this.#color, isMyTurn });
   }
 
   moveTo(nextRow, nextColumn) {
@@ -69,7 +60,7 @@ class Player {
 
     if (this.isWinner(nextRow)) {
       this.#score++;
-      this.#scoreDrawer.draw(this.#score, this.#winnerRow === 0);
+      this.dispatch("score", { score: this.#score, isBottomPlayer: this.#winnerRow === 0 });
     }
   }
 
@@ -87,7 +78,7 @@ class Player {
     this.#column = 4;
     if (shouldClearScore) {
       this.#score = 0;
-      this.#scoreDrawer.reset();
+      this.dispatch("score-reset");
     }
     this.draw(isBottomPlayerWinner);
   }
