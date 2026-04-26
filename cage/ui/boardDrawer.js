@@ -1,8 +1,10 @@
 import AbstractDrawer from "./AbstractDrawer.js";
 
-const TILE_SIZE_IN_PX = 48;
-const TILE_BACKGROUND_SIZE_IN_PX = 50;
+export const TILE_SIZE_IN_PX = 40;
+export const TILE_BACKGROUND_SIZE_IN_PX = 50;
 const BOARD_SIZE_IN_PX = 600;
+
+export const WALL_SIZE_IN_PX = TILE_BACKGROUND_SIZE_IN_PX - TILE_SIZE_IN_PX;
 
 class BoardDrawer extends AbstractDrawer {
   constructor(ctx) {
@@ -36,6 +38,25 @@ class BoardDrawer extends AbstractDrawer {
           TILE_SIZE_IN_PX,
           TILE_SIZE_IN_PX,
         );
+
+        //Draw empty walls
+        this.ctx.fillStyle = "gray";
+        if (xAxis <= state.tilesNumber - 1) {
+          this.ctx.fillRect(
+            TILE_BACKGROUND_SIZE_IN_PX * yAxis,
+            TILE_BACKGROUND_SIZE_IN_PX * xAxis + TILE_SIZE_IN_PX,
+            TILE_SIZE_IN_PX,
+            WALL_SIZE_IN_PX,
+          );
+        }
+        if (yAxis <= state.tilesNumber - 1) {
+          this.ctx.fillRect(
+            TILE_BACKGROUND_SIZE_IN_PX * yAxis + TILE_SIZE_IN_PX,
+            TILE_BACKGROUND_SIZE_IN_PX * xAxis,
+            WALL_SIZE_IN_PX,
+            TILE_SIZE_IN_PX,
+          );
+        }
       }
     }
   }
