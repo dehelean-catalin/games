@@ -38,10 +38,23 @@ class BoardDrawer extends AbstractDrawer {
           TILE_SIZE_IN_PX,
           TILE_SIZE_IN_PX,
         );
+      }
+    }
+  }
 
-        //Draw empty walls
-        this.ctx.fillStyle = "gray";
-        if (xAxis <= state.tilesNumber - 1) {
+  drawWalls(state) {
+    const length = state.walls.length;
+    for (let xAxis = 0; xAxis < length; xAxis++) {
+      for (let yAxis = 0; yAxis < length; yAxis++) {
+        let wallStyle = state.isWallMode ? "white" : "gray";
+        const wall = state.walls[xAxis][yAxis];
+        const isWallEmpty = !wall?.size;
+
+        if (xAxis < length - 1) {
+          if (!isWallEmpty && wall.has("x")) {
+            wallStyle = "blue";
+          }
+          this.ctx.fillStyle = wallStyle;
           this.ctx.fillRect(
             TILE_BACKGROUND_SIZE_IN_PX * yAxis,
             TILE_BACKGROUND_SIZE_IN_PX * xAxis + TILE_SIZE_IN_PX,
@@ -49,7 +62,13 @@ class BoardDrawer extends AbstractDrawer {
             WALL_SIZE_IN_PX,
           );
         }
-        if (yAxis <= state.tilesNumber - 1) {
+
+        if (yAxis < length - 1) {
+          wallStyle = state.isWallMode ? "white" : "gray";
+          if (!isWallEmpty && wall.has("y")) {
+            wallStyle = "red";
+          }
+          this.ctx.fillStyle = wallStyle;
           this.ctx.fillRect(
             TILE_BACKGROUND_SIZE_IN_PX * yAxis + TILE_SIZE_IN_PX,
             TILE_BACKGROUND_SIZE_IN_PX * xAxis,
@@ -60,6 +79,7 @@ class BoardDrawer extends AbstractDrawer {
       }
     }
   }
+
   reset() {
     this.ctx.clearRect(0, 0, BOARD_SIZE_IN_PX, BOARD_SIZE_IN_PX);
   }
